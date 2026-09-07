@@ -28,8 +28,8 @@ pipeline {
                     echo --- py launcher ---
                     where py
                     echo --- chrome ---
-                    if exist "C:\Program Files\Google\Chrome\Application\chrome.exe" echo CHROME FOUND
-                    if exist "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" echo CHROME FOUND X86
+                    if exist "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" echo CHROME FOUND
+                    if exist "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe" echo CHROME FOUND X86
                     exit /b 0
                 '''
             }
@@ -44,10 +44,9 @@ pipeline {
                     if exist venv rmdir /s /q venv
                     python -m venv venv
                     echo [2/3] Upgrading pip...
-                    venv\Scripts\python.exe -m pip install --upgrade pip
+                    venv\\Scripts\\python.exe -m pip install --upgrade pip
                     echo [3/3] Installing testing packages...
-                    venv\Scripts\python.exe -m pip install -r requirements.txt
-                    venv\Scripts\python.exe -m pip list
+                    venv\\Scripts\\python.exe -m pip install -r requirements.txt
                 '''
             }
         }
@@ -59,7 +58,7 @@ pipeline {
                     @echo off
                     if not exist reports mkdir reports
                     echo Running Pytest Suite...
-                    venv\Scripts\python.exe -m pytest tests/ -v --junitxml=reports/junit-report.xml
+                    venv\\Scripts\\python.exe -m pytest tests/ -v --junitxml=reports/junit-report.xml
                 '''
             }
         }

@@ -18,19 +18,25 @@ pipeline {
 
         stage('Environment Check') {
             steps {
-                echo '=== STAGE 2: ENVIRONMENT CHECK - locating Python and Chrome ==='
+                echo '=== STAGE 2: ENVIRONMENT CHECK - locating the Python interpreter and Chrome ==='
                 bat '''
                     @echo off
                     ver
-                    echo --- python on PATH ---
-                    where python
-                    python --version
-                    echo --- py launcher ---
-                    where py
+                    set "PY="
+                    for /f "delims=" %%F in ('dir /b /s "C:\\Users\\sdube\\AppData\\Local\\Programs\\Python\\python.exe" 2^^>nul') do if not defined PY set "PY=%%F"
+                    if not defined PY for /f "delims=" %%F in ('dir /b /s "C:\\Program Files\\Python*\\python.exe" 2^^>nul') do if not defined PY set "PY=%%F"
+                    if not defined PY for /f "delims=" %%F in ('dir /b /s "C:\\Users\\sdube\\anaconda3\\python.exe" 2^^>nul') do if not defined PY set "PY=%%F"
+                    if not defined PY for /f "delims=" %%F in ('dir /b /s "C:\\Python*\\python.exe" 2^^>nul') do if not defined PY set "PY=%%F"
+                    if not defined PY (
+                        echo ERROR: No Python interpreter was found on this machine.
+                        exit /b 1
+                    )
+                    echo Detected Python interpreter: %PY%
+                    "%PY%" --version
+                    > python_path.txt echo %PY%
                     echo --- chrome ---
                     if exist "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" echo CHROME FOUND
                     if exist "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe" echo CHROME FOUND X86
-                    exit /b 0
                 '''
             }
         }
@@ -40,9 +46,10 @@ pipeline {
                 echo '=== STAGE 3: SETUP - creating the virtual environment and installing packages ==='
                 bat '''
                     @echo off
-                    echo [1/3] Creating virtual environment...
+                    set /p PY=<python_path.txt
+                    echo [1/3] Creating virtual environment with %PY% ...
                     if exist venv rmdir /s /q venv
-                    python -m venv venv
+                    "%PY%" -m venv venv
                     echo [2/3] Upgrading pip...
                     venv\\Scripts\\python.exe -m pip install --upgrade pip
                     echo [3/3] Installing testing packages...

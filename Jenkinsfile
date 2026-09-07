@@ -23,20 +23,14 @@ pipeline {
                     @echo off
                     ver
                     set "PY="
-                    for /f "delims=" %%F in ('dir /b /s "C:\\Users\\sdube\\AppData\\Local\\Programs\\Python\\python.exe" 2^^>nul') do if not defined PY set "PY=%%F"
-                    if not defined PY for /f "delims=" %%F in ('dir /b /s "C:\\Program Files\\Python*\\python.exe" 2^^>nul') do if not defined PY set "PY=%%F"
-                    if not defined PY for /f "delims=" %%F in ('dir /b /s "C:\\Users\\sdube\\anaconda3\\python.exe" 2^^>nul') do if not defined PY set "PY=%%F"
-                    if not defined PY for /f "delims=" %%F in ('dir /b /s "C:\\Python*\\python.exe" 2^^>nul') do if not defined PY set "PY=%%F"
-                    if not defined PY (
-                        echo ERROR: No Python interpreter was found on this machine.
-                        exit /b 1
-                    )
+                    for /f "delims=" %%F in ('dir /b /s "C:\\Users\\sdube\\AppData\\Local\\Programs\\Python\\python.exe"') do if not defined PY set "PY=%%F"
+                    if not defined PY for /f "delims=" %%F in ('dir /b /s "C:\\Program Files\\Python*\\python.exe"') do if not defined PY set "PY=%%F"
+                    if not defined PY for /f "delims=" %%F in ('dir /b /s "C:\\Users\\sdube\\anaconda3\\python.exe"') do if not defined PY set "PY=%%F"
+                    if not defined PY exit /b 1
                     echo Detected Python interpreter: %PY%
                     "%PY%" --version
-                    > python_path.txt echo %PY%
-                    echo --- chrome ---
+                    echo %PY%> python_path.txt
                     if exist "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" echo CHROME FOUND
-                    if exist "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe" echo CHROME FOUND X86
                 '''
             }
         }
@@ -47,7 +41,7 @@ pipeline {
                 bat '''
                     @echo off
                     set /p PY=<python_path.txt
-                    echo [1/3] Creating virtual environment with %PY% ...
+                    echo [1/3] Creating virtual environment with %PY%
                     if exist venv rmdir /s /q venv
                     "%PY%" -m venv venv
                     echo [2/3] Upgrading pip...
